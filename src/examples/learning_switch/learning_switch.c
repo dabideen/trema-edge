@@ -73,7 +73,7 @@ update_forwarding_db( void *forwarding_db ) {
   foreach_hash( forwarding_db, age_forwarding_db, forwarding_db );
 }
 
-
+/*
 static void
 learn( hash_table *forwarding_db, struct key new_key, uint32_t port_no ) {
   forwarding_entry *entry = lookup_hash_entry( forwarding_db, &new_key );
@@ -121,17 +121,28 @@ do_flooding( packet_in packet_in, uint32_t in_port ) {
   delete_actions( actions );
 }
 
-
 static void
 send_packet( uint32_t destination_port, packet_in packet_in, uint32_t in_port ) {
+  info("got here");
+  uint32_t dest = destination_port;
+  oxm_matches *match = create_oxm_matches();
+  append_oxm_match_eth_type( match, 0x0806);
+  if(in_port == 1){
+      info( "config: ARP in 1 -> out 2");
+      append_oxm_match_in_port( match, 2);
+      dest = 1;
+  }
+  else{
+      info( "config: ARP in 2 -> out 1");
+      append_oxm_match_in_port( match, 1);
+      dest = 2;
+  }
+
   openflow_actions *actions = create_actions();
-  append_action_output( actions, destination_port, OFPCML_NO_BUFFER );
+  append_action_output( actions, dest, OFPCML_NO_BUFFER );
 
   openflow_instructions *insts = create_instructions();
   append_instructions_apply_actions( insts, actions );
-
-  oxm_matches *match = create_oxm_matches();
-  set_match_from_packet( match, in_port, NULL, packet_in.data );
 
   buffer *flow_mod = create_flow_mod(
     get_transaction_id(),
@@ -154,6 +165,7 @@ send_packet( uint32_t destination_port, packet_in packet_in, uint32_t in_port ) 
   delete_oxm_matches( match );
   delete_instructions( insts );
 
+
   if ( packet_in.buffer_id == OFP_NO_BUFFER ) {
     buffer *frame = duplicate_buffer( packet_in.data );
     fill_ether_padding( frame );
@@ -169,12 +181,14 @@ send_packet( uint32_t destination_port, packet_in packet_in, uint32_t in_port ) 
     free_buffer( frame );
   }
 
+
   delete_actions( actions );
 }
-
+*/
 
 static void
 handle_packet_in( uint64_t datapath_id, packet_in message ) {
+  info("got packet to handle");
   if ( message.data == NULL ) {
     error( "data must not be NULL" );
     return;
@@ -188,24 +202,50 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
     return;
   }
 
-  struct key new_key;
-  packet_info packet_info = get_packet_info( message.data );
-  memcpy( new_key.mac, packet_info.eth_macsa, OFP_ETH_ALEN );
-  new_key.datapath_id = datapath_id;
-  hash_table *forwarding_db = message.user_data;
-  learn( forwarding_db, new_key, in_port );
 
-  struct key search_key;
-  memcpy( search_key.mac, packet_info.eth_macda, OFP_ETH_ALEN );
-  search_key.datapath_id = datapath_id;
-  forwarding_entry *destination = lookup_hash_entry( forwarding_db, &search_key );
+  info("got here");
+  uint32_t dest = 1;
+  oxm_matches *match = create_oxm_matches();
+  append_oxm_match_eth_type( match, 0x0806);
+  if(in_port == 1){
+      info( "config: ARP in 1 -> out 2");
+      append_oxm_match_in_port( match, 1);
+      dest = 2;
+  }
+  else{
+      info( "config: ARP in 2 -> out 1");
+      append_oxm_match_in_port( match, 2);
+      dest = 1;
+  }
 
-  if ( destination == NULL ) {
-    do_flooding( message, in_port );
-  }
-  else {
-    send_packet( destination->port_no, message, in_port );
-  }
+  openflow_actions *actions = create_actions();
+  append_action_output( actions, dest, OFPCML_NO_BUFFER );
+
+  openflow_instructions *insts = create_instructions();
+  append_instructions_apply_actions( insts, actions );
+
+  buffer *flow_mod = create_flow_mod(
+    get_transaction_id(),
+    get_cookie(),
+    0,
+    0,
+    OFPFC_ADD,
+    60,
+    0,
+    OFP_HIGH_PRIORITY,
+    message.buffer_id,
+    0,
+    0,
+    OFPFF_SEND_FLOW_REM,
+    match,
+    insts
+  );
+  send_openflow_message( datapath_id, flow_mod );
+  free_buffer( flow_mod );
+  delete_oxm_matches( match );
+  delete_instructions( insts );
+
+
 }
 
 
