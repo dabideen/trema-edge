@@ -203,12 +203,12 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
   }
 
 
-  uint32_t dest = 1;
-  info("got here");
+//  uint32_t dest = 1;
+  info("got a packet to handle from, %d",datapath_id);
 //  packet_info packet_info = get_packet_info( message );
 //  if((packet_info.format & NW_ARP) == NW_ARP){
 //  if(packet_type_arp(message.data)){
-  info("got ARP");
+/*  info("got ARP");
   oxm_matches *match = create_oxm_matches();
   append_oxm_match_eth_type( match, 0x0806);
   if(in_port == 1){
@@ -325,7 +325,7 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
   delete_oxm_matches( match3 );
   delete_instructions( insts3 );
   info("done sending");
-
+*/
 }
 
 
@@ -380,6 +380,51 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   send_openflow_message( datapath_id, flow_mod );
   free_buffer( flow_mod );
   delete_instructions( insts );
+
+  
+  info("sending ARP config to %d",datapath_id);
+  uint32_t dest = OFPP_ALL;
+  oxm_matches *match2 = create_oxm_matches();
+  append_oxm_match_eth_type( match2, 0x0806);
+/*  if(in_port == 1){
+      info( "config: ARP in 1 -> out 2");
+      append_oxm_match_in_port( match2, 1);
+      dest = 2;
+  }
+  else{
+      info( "config: ARP in 2 -> out 1");
+      append_oxm_match_in_port( match2, 2);
+      dest = 1;
+  }
+*/
+
+  openflow_actions *actions2 = create_actions();
+  append_action_output( actions2, dest, OFPCML_NO_BUFFER );
+
+  openflow_instructions *insts2 = create_instructions();
+  append_instructions_apply_actions( insts2, actions2 );
+
+  buffer *flow_mod2 = create_flow_mod(
+    get_transaction_id(),
+    get_cookie(),
+    0,
+    0,
+    OFPFC_ADD,
+    60,
+    0,
+    OFP_HIGH_PRIORITY,
+    OFP_NO_BUFFER,
+    0,
+    0,
+    OFPFF_SEND_FLOW_REM,
+    match2,
+    insts2
+  );
+  send_openflow_message( datapath_id, flow_mod2 );
+  free_buffer( flow_mod2 );
+  delete_oxm_matches( match2 );
+  delete_instructions( insts2 );
+
 }
 
 
