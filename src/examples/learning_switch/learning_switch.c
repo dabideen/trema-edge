@@ -203,129 +203,8 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
   }
 
 
-//  uint32_t dest = 1;
   info("got a packet to handle from, %d",datapath_id);
-//  packet_info packet_info = get_packet_info( message );
-//  if((packet_info.format & NW_ARP) == NW_ARP){
-//  if(packet_type_arp(message.data)){
-/*  info("got ARP");
-  oxm_matches *match = create_oxm_matches();
-  append_oxm_match_eth_type( match, 0x0806);
-  if(in_port == 1){
-      info( "config: ARP in 1 -> out 2");
-      append_oxm_match_in_port( match, 1);
-      dest = 2;
-  }
-  else{
-      info( "config: ARP in 2 -> out 1");
-      append_oxm_match_in_port( match, 2);
-      dest = 1;
-  }
 
-  openflow_actions *actions = create_actions();
-  append_action_output( actions, dest, OFPCML_NO_BUFFER );
-
-  openflow_instructions *insts = create_instructions();
-  append_instructions_apply_actions( insts, actions );
-
-  buffer *flow_mod = create_flow_mod(
-    get_transaction_id(),
-    get_cookie(),
-    0,
-    0,
-    OFPFC_ADD,
-    60,
-    0,
-    OFP_HIGH_PRIORITY,
-    message.buffer_id,
-    0,
-    0,
-    OFPFF_SEND_FLOW_REM,
-    match,
-    insts
-  );
-  send_openflow_message( datapath_id, flow_mod );
-  free_buffer( flow_mod );
-  delete_oxm_matches( match );
-  delete_instructions( insts );
-//  return;
-//  }
-//  if(packet_type_ipv4(message.data)){
-  info("sending second config: ipv4");
-  oxm_matches *match2 = create_oxm_matches();
-  append_oxm_match_eth_type( match2, 0x0800);
-  append_oxm_match_in_port( match2, 2);
-  dest = 1;
-
-  openflow_actions *actions2 = create_actions();
-  append_action_push_mpls(actions2,0x8847);
-  append_action_set_field_mpls_label(actions2,4120955);
-  append_action_output( actions2, dest, OFPCML_NO_BUFFER );
-
-  openflow_instructions *insts2 = create_instructions();
-  append_instructions_apply_actions( insts2, actions2 );
-
-  buffer *flow_mod2 = create_flow_mod(
-    get_transaction_id(),
-    get_cookie(),
-    0,
-    0,
-    OFPFC_ADD,
-    60,
-    0,
-    OFP_HIGH_PRIORITY,
-    message.buffer_id,
-    0,
-    0,
-    OFPFF_SEND_FLOW_REM,
-    match2,
-    insts2
-  );
-  send_openflow_message( datapath_id, flow_mod2 );
-  free_buffer( flow_mod2 );
-  delete_oxm_matches( match2 );
-  delete_instructions( insts2 );
-  info("done sending");
-//  return;
-//  }
-
-  info("sending third config");
-  oxm_matches *match3 = create_oxm_matches();
-  append_oxm_match_eth_type( match3, 0x8847);
-  append_oxm_match_in_port( match3, 1);
-  append_oxm_match_mpls_label(match3, 4120955);
-  dest = 2;
-
-  openflow_actions *actions3 = create_actions();
-  append_action_pop_mpls(actions3, 0x0800);
-  append_action_output( actions3, dest, OFPCML_NO_BUFFER );
-
-
-  openflow_instructions *insts3 = create_instructions();
-  append_instructions_apply_actions( insts3, actions3 );
-
-  buffer *flow_mod3 = create_flow_mod(
-    get_transaction_id(),
-    get_cookie(),
-    0,
-    0,
-    OFPFC_ADD,
-    60,
-    0,
-    OFP_HIGH_PRIORITY,
-    message.buffer_id,
-    0,
-    0,
-    OFPFF_SEND_FLOW_REM,
-    match3,
-    insts3
-  );
-  send_openflow_message( datapath_id, flow_mod3 );
-  free_buffer( flow_mod3 );
-  delete_oxm_matches( match3 );
-  delete_instructions( insts3 );
-  info("done sending");
-*/
 }
 
 
@@ -386,17 +265,8 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   uint32_t dest = OFPP_ALL;
   oxm_matches *match2 = create_oxm_matches();
   append_oxm_match_eth_type( match2, 0x0806);
-/*  if(in_port == 1){
-      info( "config: ARP in 1 -> out 2");
-      append_oxm_match_in_port( match2, 1);
-      dest = 2;
-  }
-  else{
-      info( "config: ARP in 2 -> out 1");
-      append_oxm_match_in_port( match2, 2);
-      dest = 1;
-  }
-*/
+
+
 
   openflow_actions *actions2 = create_actions();
   append_action_output( actions2, dest, OFPCML_NO_BUFFER );
@@ -424,6 +294,82 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   free_buffer( flow_mod2 );
   delete_oxm_matches( match2 );
   delete_instructions( insts2 );
+
+
+  info("sending second config: ipv4");
+  oxm_matches *match3 = create_oxm_matches();
+  append_oxm_match_eth_type( match3, 0x0800);
+//  append_oxm_match_in_port( match2, 2);
+//  dest = 1;
+
+  openflow_actions *actions3 = create_actions();
+  append_action_push_mpls(actions3,0x8847);
+  append_action_set_field_mpls_label(actions3,4120955);
+  append_action_output( actions3, dest, OFPCML_NO_BUFFER );
+
+  openflow_instructions *insts3 = create_instructions();
+  append_instructions_apply_actions( insts3, actions3 );
+
+  buffer *flow_mod3 = create_flow_mod(
+    get_transaction_id(),
+    get_cookie(),
+    0,
+    0,
+    OFPFC_ADD,
+    60,
+    0,
+    OFP_HIGH_PRIORITY,
+    OFP_NO_BUFFER,
+    0,
+    0,
+    OFPFF_SEND_FLOW_REM,
+    match3,
+    insts3
+  );
+  send_openflow_message( datapath_id, flow_mod3 );
+  free_buffer( flow_mod3 );
+  delete_oxm_matches( match3 );
+  delete_instructions( insts3 );
+  info("done sending");
+
+
+  info("sending third config");
+  oxm_matches *match4 = create_oxm_matches();
+  append_oxm_match_eth_type( match4, 0x8847);
+//  append_oxm_match_mpls_label(match4, 4120955);
+
+  openflow_actions *actions4 = create_actions();
+  append_action_pop_mpls(actions4, 0x0800);
+  append_action_output( actions4, dest, OFPCML_NO_BUFFER );
+
+
+  openflow_instructions *insts4 = create_instructions();
+  append_instructions_apply_actions( insts4, actions4 );
+
+  buffer *flow_mod4 = create_flow_mod(
+    get_transaction_id(),
+    get_cookie(),
+    0,
+    0,
+    OFPFC_ADD,
+    60,
+    0,
+    OFP_HIGH_PRIORITY,
+    OFP_NO_BUFFER,
+    0,
+    0,
+    OFPFF_SEND_FLOW_REM,
+    match4,
+    insts4
+  );
+  send_openflow_message( datapath_id, flow_mod3 );
+  free_buffer( flow_mod4 );
+  delete_oxm_matches( match4 );
+  delete_instructions( insts4 );
+  info("done sending");
+
+
+
 
 }
 
