@@ -11,13 +11,13 @@ LDFLAGS = -ltrema -lpthread -lsqlite3 -ldl -lrt
 
 LIBDIR = ../../lib
 
-TARGET_LEARNSW = pSwitch
-SRCS_LEARNSW = pSwitch.c
-OBJS_LEARNSW = $(SRCS_LEARNSW:.c=.o)
+TARGET_PSWITCH = pSwitch
+SRCS_PSWITCH = pSwitch.c
+OBJS_PSWITCH = $(SRCS_PSWITCH:.c=.o)
 
-TARGETS = $(TARGET_LEARNSW)
-SRCS = $(SRCS_LEARNSW)
-OBJS = $(OBJS_LEARNSW)
+TARGETS = $(TARGET_PSWITCH)
+SRCS = $(SRCS_PSWITCH)
+OBJS = $(OBJS_PSWITCH)
 
 DEPENDS = .depends
 
@@ -27,8 +27,8 @@ DEPENDS = .depends
 
 all: depend $(TARGETS)
 
-$(TARGET_LEARNSW): $(OBJS_LEARNSW)
-	$(CC) -L$(LIBDIR) -o $(TARGET_LEARNSW) $(OBJS_LEARNSW) $(LIBDIR)/libtrema.a $(LDFLAGS)
+$(TARGET_PSWITCH): $(OBJS_PSWITCH)
+	$(CC) -L$(LIBDIR) -o $(TARGET_PSWITCH) $(OBJS_PSWITCH) $(LIBDIR)/libtrema.a $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

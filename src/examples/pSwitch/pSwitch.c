@@ -212,7 +212,7 @@ int
 main( int argc, char *argv[] ) {
   init_trema( &argc, &argv );
 
-  set_packet_in_handler( handle_packet_in, forwarding_db );
+  set_packet_in_handler( handle_packet_in, NULL );
 
   set_switch_ready_handler( handle_switch_ready, NULL );
 
