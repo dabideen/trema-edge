@@ -29,6 +29,7 @@
 time_t
 now() {
   return time( NULL );
+
 }
 
 
@@ -93,10 +94,10 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   free_buffer( flow_mod );
   delete_instructions( insts );
 
-//  sleep(2000);
-  
-  info("sending ARP config to %d",datapath_id);
   uint32_t dest = OFPP_ALL;
+//  sleep(2000);
+
+  info("sending ARP config to %d",datapath_id);
   oxm_matches *match2 = create_oxm_matches();
   append_oxm_match_eth_type( match2, 0x0806);
 
@@ -139,7 +140,7 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
 
   openflow_actions *actions3 = create_actions();
   append_action_push_mpls(actions3,0x8847);
-  append_action_set_field_mpls_label(actions3,4120955);
+  append_action_set_field_mpls_label(actions3,412095);
   append_action_output( actions3, dest, OFPCML_NO_BUFFER );
 
   openflow_instructions *insts3 = create_instructions();
@@ -172,7 +173,7 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   info("sending third config");
   oxm_matches *match4 = create_oxm_matches();
   append_oxm_match_eth_type( match4, 0x8847);
-  append_oxm_match_mpls_label(match4, 4120955);
+  append_oxm_match_mpls_label(match4, 412095);
 
   openflow_actions *actions4 = create_actions();
   append_action_pop_mpls(actions4, 0x0800);
