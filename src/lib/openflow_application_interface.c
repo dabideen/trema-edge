@@ -2056,6 +2056,7 @@ send_openflow_message( const uint64_t datapath_id, buffer *message ) {
   struct ofp_header *ofp;
   openflow_service_header_t header;
 
+  info("sending....1");
   maybe_init_openflow_application_interface();
   assert( openflow_application_interface_initialized );
 
@@ -2085,7 +2086,7 @@ send_openflow_message( const uint64_t datapath_id, buffer *message ) {
   snprintf( remote_service_name, sizeof( remote_service_name ),
             "switch.%#" PRIx64, datapath_id );
 
-  debug( "Sending an OpenFlow message to %#" PRIx64
+  info( "Sending an OpenFlow message to %#" PRIx64
          " ( service_name = %s, remote_service_name = %s, "
          "ofp_header = [version = %#x, type = %#x, length = %u, transaction_id = %#x] ).",
          datapath_id, service_name, remote_service_name,
@@ -2093,7 +2094,12 @@ send_openflow_message( const uint64_t datapath_id, buffer *message ) {
 
   ret =  send_message( remote_service_name, MESSENGER_OPENFLOW_MESSAGE,
                        buffer->data, buffer->length );
-
+  if(ret){
+      info("message sent");
+  }
+  else{
+      info("message not sent");
+  }
   free_buffer( buffer );
 
   update_openflow_stats( ofp->type, OPENFLOW_MESSAGE_SEND, ret );

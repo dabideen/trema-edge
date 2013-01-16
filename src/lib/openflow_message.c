@@ -702,6 +702,7 @@ create_flow_mod( const uint32_t transaction_id, const uint64_t cookie, const uin
   struct ofp_instruction *instruction, *tmp_insts;
   list_element *instruction_element;
 
+  info("creating flow mod");
   if ( instructions != NULL ) {
     debug( "# of instructions = %d.", instructions->n_instructions );
     instructions_length = get_instructions_length( instructions );
@@ -769,6 +770,7 @@ create_flow_mod( const uint32_t transaction_id, const uint64_t cookie, const uin
     }
   }
 
+  info("flow mod created");
   return buffer;
 }
 
@@ -7168,6 +7170,7 @@ END:
 
 int
 validate_openflow_message( const buffer *message ) {
+  info("validating OF message");
   int ret;
 
   assert( message != NULL );
@@ -7222,6 +7225,7 @@ validate_openflow_message( const buffer *message ) {
     ret = validate_packet_out( message );
     break;
   case OFPT_FLOW_MOD:
+    info("validating flor mod");
     ret = validate_flow_mod( message );
     break;
   case OFPT_GROUP_MOD:
