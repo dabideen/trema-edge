@@ -56,8 +56,10 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
     return;
   }
 
-
+  packet_info packet_info = get_packet_info( message.data );
+  
   info("got a packet to handle from, %d",datapath_id);
+  info("SA: %d:%d:%d:%d:%d:%d",packet_info.eth_macsa[0],packet_info.eth_macsa[1],packet_info.eth_macsa[2],packet_info.eth_macsa[3],packet_info.eth_macsa[4],packet_info.eth_macsa[5]);
 
 }
 
@@ -69,6 +71,20 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
 static void
 handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   UNUSED( user_data );
+  uint64_t dpid;
+  info("switch is ready: %#" PRIx64,datapath_id);
+  uint8_t eth_src[6];
+  eth_src[5] = datapath_id % 256;
+  dpid = datapath_id/256;
+  eth_src[4] = dpid % 256;
+  dpid = dpid/256;
+  eth_src[3] = dpid % 256;
+  dpid = dpid/256;
+  eth_src[2] = dpid % 256;
+  dpid = dpid/256;
+  eth_src[1] = dpid % 256;
+  dpid = dpid/256;
+  eth_src[0] = dpid % 256;
 
   openflow_actions *actions = create_actions();
   append_action_output( actions, OFPP_CONTROLLER, OFPCML_NO_BUFFER );
@@ -109,6 +125,7 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
 
   openflow_actions *actions2 = create_actions();
   append_action_output( actions2, dest, OFPCML_NO_BUFFER );
+  append_action_set_field_eth_src( actions2, eth_src );
 
   openflow_instructions *insts2 = create_instructions();
   append_instructions_apply_actions( insts2, actions2 );
