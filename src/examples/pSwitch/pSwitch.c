@@ -23,7 +23,9 @@
 #include <time.h>
 #include <assert.h>
 #include "trema.h"
-
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
 
 time_t
@@ -94,14 +96,16 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   free_buffer( flow_mod );
   delete_instructions( insts );
 
-  uint32_t dest = OFPP_ALL;
+
+  uint32_t dest = 3;
 //  sleep(2000);
 
   info("sending ARP config to %d",datapath_id);
   oxm_matches *match2 = create_oxm_matches();
+  append_oxm_match_in_port( match2,1);
   append_oxm_match_eth_type( match2, 0x0806);
-
-
+  append_oxm_match_arp_tpa(match2, 0xa0aff01, 0xa0affff);
+  //append_oxm_match_ipv4_src( match2, 0xa0a2803,0xffffff00);
 
   openflow_actions *actions2 = create_actions();
   append_action_output( actions2, dest, OFPCML_NO_BUFFER );
@@ -135,12 +139,12 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   info("sending second config: ipv4");
   oxm_matches *match3 = create_oxm_matches();
   append_oxm_match_eth_type( match3, 0x0800);
-//  append_oxm_match_in_port( match2, 2);
-//  dest = 1;
+  append_oxm_match_in_port( match3,1);
+  dest = OFPP_LOCAL;
 
   openflow_actions *actions3 = create_actions();
-  append_action_push_mpls(actions3,0x8847);
-  append_action_set_field_mpls_label(actions3,412095);
+  //append_action_push_mpls(actions3,0x8847);
+  //append_action_set_field_mpls_label(actions3,412095);
   append_action_output( actions3, dest, OFPCML_NO_BUFFER );
 
   openflow_instructions *insts3 = create_instructions();
@@ -168,17 +172,16 @@ handle_switch_ready( uint64_t datapath_id, void *user_data ) {
   delete_instructions( insts3 );
   info("done sending");
 
-//  sleep(2000);
 
   info("sending third config");
   oxm_matches *match4 = create_oxm_matches();
   append_oxm_match_eth_type( match4, 0x8847);
-  append_oxm_match_mpls_label(match4, 412095);
+//  append_oxm_match_mpls_label(match4, 412095);
 
   openflow_actions *actions4 = create_actions();
-  append_action_pop_mpls(actions4, 0x0800);
-  append_action_output( actions4, dest, OFPCML_NO_BUFFER );
-
+//  append_action_pop_mpls(actions4, 0x0800);
+  append_action_output( actions4, 2, OFPCML_NO_BUFFER );
+//  append_action_set_field_ip_dscp(actions4, 0x05);
 
   openflow_instructions *insts4 = create_instructions();
   append_instructions_apply_actions( insts4, actions4 );
