@@ -23,7 +23,8 @@ OBJECTS="${TREMA_SRC}/objects"
 
 APP_NAME="pSwitch"
 APP="${OBJECTS}/examples/pSwitch/pSwitch"
-APP_OPTS="--name ${APP_NAME} --daemonize"
+APP_OPTS="--name ${APP_NAME}"
+#APP_OPTS="--name ${APP_NAME} --daemonize"
 #APP_OPTS="-l debug --name ${APP_NAME} --daemonize"
 
 SWITCH_STATE_NOTIFY="state_notify::${APP_NAME}"
