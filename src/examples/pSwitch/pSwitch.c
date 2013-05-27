@@ -102,6 +102,7 @@ void *discoveryPing(){
    system("ping -Q 3 -b 10.10.4.255 -c 1");
    system("ping -Q 4 -b 10.10.4.255 -c 1");
    system("ping -Q 5 -b 10.10.4.255 -c 1");
+   printTopologyTable(TopologyTable);
    sleep(10);
  }
 
