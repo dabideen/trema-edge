@@ -125,8 +125,8 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
     return;
   }
 
-  uint32_t src_port = get_in_port_from_oxm_matches( message.match );
-  if ( src_port == 0 ) {
+  uint32_t dst_port = get_in_port_from_oxm_matches( message.match );
+  if ( dst_port == 0 ) {
     return;
   }
 
@@ -138,15 +138,15 @@ handle_packet_in( uint64_t datapath_id, packet_in message ) {
   src_eth = packet_info.eth_macsa;
   uint64_t src_dpid = macToDpid(src_eth);
   uint64_t dst_dpid = datapath_id;
-  uint8_t dst_port = packet_info.ipv4_tos;
+  uint8_t src_port = packet_info.ipv4_tos;
 
   //info("src:  %#" PRIx64,macToDpid(src_eth));
 
-  if(HasTopologyEntry(TopologyTable,src_dpid,(uint8_t) src_port)){
-    UpdateTopologyEntry(TopologyTable,src_dpid,(uint8_t) src_port,dst_dpid,dst_port);
+  if(HasTopologyEntry(TopologyTable,src_dpid, src_port)){
+    UpdateTopologyEntry(TopologyTable,src_dpid, src_port,dst_dpid,(uint8_t) dst_port);
   }
   else{
-    AddTopologyEntry(TopologyTable,src_dpid,(uint8_t) src_port,dst_dpid,dst_port);
+    AddTopologyEntry(TopologyTable,src_dpid, src_port,dst_dpid,(uint8_t) dst_port);
     printTopologyTable(TopologyTable);
   }
 }
